@@ -19,27 +19,16 @@ def load_models():
     from transformers import GemmaTokenizer, AutoModelForCausalLM
     load_dotenv()
     _token = os.environ["HF_TOKEN"]
-    print(f'Using HF_TOKEN={_token[:8]}{"*" * (len(_token) - 8)}')
-    t1 = round(time.time(), 1)
-    print(f'Loading tokenizer...')
     _tokenizer = GemmaTokenizer.from_pretrained(model_id)
-    t2 = round(time.time(), 1)
-    print(f'Loaded tokenizer {model_id}, {round(t2 - t1, 1)} secs. Loading model...')
     _model = AutoModelForCausalLM.from_pretrained(model_id)
-    t3 = round(time.time(), 1)
-    print(f'Loaded model {model_id}, {round(t3 - t2, 1)} secs.')
     return _token, _tokenizer, _model
 
 
 def process(_input_text):
     _token, _tokenizer, _model = load_models()
     input_ids = _tokenizer(_input_text, return_tensors="pt")
-    t1 = round(time.time(), 1)
-    print(f'Generating output...')
     _outputs = _model.generate(**input_ids, max_new_tokens=4092)
     _output_text = strip_bos_eos(_tokenizer.decode(_outputs[0]))
-    t2 = round(time.time(), 1)
-    print(f'Generated output: {_output_text}, {round(t2 - t1, 1)} secs')
     return _output_text
 
 
